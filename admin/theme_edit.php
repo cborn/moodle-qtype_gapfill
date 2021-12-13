@@ -65,6 +65,8 @@ class gapfill_theme_edit_form extends moodleform {
         $id = $this->_customdata['id'];
 
         $record = $DB->get_record('question_gapfill_theme', ['id' => $id]);
+        $maxid = $DB->get_record_sql("SELECT MAX(id) as id FROM {question_gapfill_theme}")->id;
+
         $mform = $this->_form;
         $PAGE->requires->css('/question/type/gapfill/amd/src/codemirror/lib/codemirror.css');
         $PAGE->requires->css('/question/type/gapfill/amd/src/codemirror/addon/hint/show-hint.css');
@@ -90,6 +92,9 @@ class gapfill_theme_edit_form extends moodleform {
         $navbuttons = [];
         $navbuttons[] = $mform->createElement('submit', 'previous', 'Previous');
         $navbuttons[] = $mform->createElement('submit', 'next', 'Next');
+        if ($record->id  ==  $maxid) {
+            $navbuttons[] = $mform->createElement('submit', 'newrecord', 'New theme');
+        }
         $mform->addGroup($navbuttons);
         $this->definition_after_data();
     }
@@ -150,7 +155,7 @@ if ($data = $mform->get_data()) {
         }
     }
 
- }
+}
 
 
 if ($data = $mform->get_data()) {
