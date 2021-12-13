@@ -31,11 +31,12 @@ require_once($CFG->libdir.'/formslib.php');
 $previous = optional_param('previous', '', PARAM_TEXT);
 $next = optional_param('next', '', PARAM_TEXT);
 $id = optional_param('id', '', PARAM_INT);
-// //$PAGE->set_url(new moodle_url('/'));
 global $PAGE;
 $PAGE->set_context(context_system::instance());
 $url = new moodle_url('/course/report/completion/index.php', ['course' => 'popo']);
 $PAGE->set_url($url);
+
+admin_externalpage_setup('qtype_gapfill_theme_edit');
 
 
 /**
@@ -158,6 +159,8 @@ if ($data = $mform->get_data()) {
         redirect($url);
     }
 }
+
 echo $OUTPUT->header();
 $mform->display();
+
 echo $OUTPUT->footer();
