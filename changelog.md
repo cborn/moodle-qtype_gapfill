@@ -362,8 +362,4 @@ Version 1.2 will colour duplicate answers yellow when discard duplicates mode is
 Version 1.1 includes a count of correct answers and clears incorrect responses in interactive mode
 
 ### Gapfill question type for Moodle V 1.0 Nov 2012
-<<<<<<< HEAD
 This question type was created under Moodle 2.2 and tested with 2.3 and 2.4 It will not work with versions of moodle prior to 2.1.
-=======
-This question type was created under Moodle 2.2 and tested with 2.3 and 2.4 It will not work with versions of moodle prior to 2.1.
->>>>>>> master
