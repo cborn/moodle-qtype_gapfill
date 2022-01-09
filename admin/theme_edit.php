@@ -65,15 +65,15 @@ class gapfill_theme_edit_form extends moodleform {
         $id = $this->_customdata['id'];
 
         $record = $DB->get_record('question_gapfill_theme', ['id' => $id]);
+
         $maxid = $DB->get_record_sql("SELECT MAX(id) as id FROM {question_gapfill_theme}")->id;
+        $minid = $DB->get_record_sql("SELECT MIN(id) as id FROM {question_gapfill_theme}")->id;
 
         $mform = $this->_form;
         $PAGE->requires->css('/question/type/gapfill/amd/src/codemirror/lib/codemirror.css');
         $PAGE->requires->css('/question/type/gapfill/amd/src/codemirror/addon/hint/show-hint.css');
         $PAGE->requires->js_call_amd('qtype_gapfill/theme_edit', 'init');
 
-
-        //$themes = get_config('qtype_gapfill', 'themes');
 
         $mform->addElement('text', 'id');
         $mform->setType('id', PARAM_INT);
@@ -91,10 +91,22 @@ class gapfill_theme_edit_form extends moodleform {
 
         $navbuttons = [];
         $navbuttons[] = $mform->createElement('submit', 'previous', 'Previous');
-        $navbuttons[] = $mform->createElement('submit', 'next', 'Next');
-        if ($record->id  ==  $maxid) {
-            $navbuttons[] = $mform->createElement('submit', 'newrecord', 'New theme');
+        $mform->disabledIf('previous', 'id', 'eq',$minid);
+
+        if($id == $minid) {
+            $navbuttons[] = $mform->createElement('static','firstrecord','','First record');
         }
+
+        $navbuttons[] = $mform->createElement('submit', 'next', 'Next');
+
+        $mform->disabledIf('next', 'id', 'eq',$maxid);
+
+        if($id == $maxid) {
+          $navbuttons[] = $mform->createElement('static','lastrecord','','Last record');
+        }
+
+        $navbuttons[] = $mform->createElement('submit', 'newrecord', 'New theme');
+
         $mform->addGroup($navbuttons);
         $this->definition_after_data();
     }
