@@ -420,6 +420,15 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * @return string
      */
     public function is_used(string $draggable, question_attempt $qa, string $cssclasses): string {
+
+        // Remove custom tags.
+        preg_match_all('/<(.+?)[\s]*\/?[\s]*>/si', trim($draggable), $tags);
+        $tags = array_unique($tags[0]);
+
+        foreach($tags as $tag){
+            $draggable = str_replace($tag, '', $draggable);
+        }
+
         if ((($this->singleuse == 1) && in_array($draggable, $qa->get_last_qt_data()))) {
             return $cssclasses .= ' hide ';
         }
@@ -593,6 +602,15 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
      * @return boolean
      */
     public function compare_response_with_answer($answergiven, $answer, $disableregex = false) {
+
+        // Remove custom tags.
+        preg_match_all('/<(.+?)[\s]*\/?[\s]*>/si', trim($answer), $tags);
+        $tags = array_unique($tags[0]);
+
+        foreach($tags as $tag){
+            $answer = str_replace($tag, '', $answer);
+        }
+
         /* converts things like &lt; into < */
         $answer = htmlspecialchars_decode($answer);
         $answergiven = htmlspecialchars_decode($answergiven);

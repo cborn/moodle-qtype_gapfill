@@ -93,7 +93,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         }
 
         if ($question->answerdisplay == 'dragdrop') {
-            $questiontext = $this->app_connect($question, $questiontext)."</div>";
+            $questiontext = $this->app_connect($question, $questiontext);
             if ($question->optionsaftertext == true) {
                 $output .= '<div>'.$questiontext . '</div>' . $answeroptions;
             } else {
@@ -108,7 +108,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
             $output .= html_writer::nonempty_tag('div', $question->get_validation_error(array('answer' => $output)),
              ['class' => 'validationerror']);
         }
-        return $output;
+        return $output.'</div>'; // End DIV for L81 empty_tag('div'
     }
     /**
      * populate answer options when using dragdrop mode
@@ -238,11 +238,47 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
             return html_writer::empty_tag('input', $inputattributes) . $aftergaptext;
         } else {
             /* it is a drag/drop quesiton type */
-            $inputattributes['class'] = 'droptarget ' . $inputclass;
+            $inputattributes['class'] = /* 'droptarget ' .  */$inputclass;
             if ($question->letterhints) {
                 $inputattributes = $question->get_letter_hints($qa, $inputattributes, $rightanswer, $currentanswer);
             }
-            return html_writer::empty_tag('input', $inputattributes) . $aftergaptext;
+
+            if($currentanswer){
+                $result = '';
+                foreach ($this->allanswers as $potentialanswer) {
+                   if($currentanswer == strip_tags($potentialanswer))
+                   $result = $potentialanswer;
+               }
+               $formula =  '<span  class= "cloned">' . $result . "</span>";
+            }
+
+            $classes = '';
+            $styles = '';
+
+            if(!empty($formula)) {
+                $classes = " dropped";
+                $styles = "background-color: rgb(255, 255, 255);";
+            }
+
+            if(isset($inputattributes['disabled']) && $inputattributes['disabled']){
+                $classes .= ' position-relative mr-2 ';
+                $inputattributes['type'] = 'hidden';
+                $aftergaptext .=  html_writer::empty_tag('span', array('class' => 'px-1'));
+            }else{
+                $classes .= ' position-absolute ';
+                $styles .= 'min-width: 100%;';
+            }
+
+            $html = html_writer::start_tag('div', array('class' => 'droptarget-wrapper d-inline-flex position-relative align-items-center'));
+            $html .= html_writer::start_tag('div', array('class' => 'droptarget px-2 d-flex align-items-center h-100 rounded border ' . $classes,
+                    'style' => $styles));
+            if(!empty($formula)) {
+                $html .= $formula;
+            }
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::empty_tag('input', $inputattributes) . $aftergaptext;
+            $html .= html_writer::end_tag('div');
+            return $html;
         }
     }
 

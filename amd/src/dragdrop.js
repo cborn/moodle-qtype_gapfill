@@ -66,7 +66,12 @@ define(['jquery', 'jqueryui', 'qtype_gapfill/jquery.ui.touch-punch-improved'], f
           if ($(ui.draggable).hasClass('readonly')) {
             return;
           }
-          this.value = $(ui.draggable).text();
+          var cloned = ui.draggable[0].cloneNode(true);
+          cloned.id = cloned.id + '_cloned';
+          cloned.className = "cloned";
+          this.innerHTML = '';
+          this.nextElementSibling.value = $(ui.draggable).text();
+          this.appendChild(cloned);
           $(this).css("background-color", "white");
           $(this).addClass("dropped");
           if (singleuse) {
