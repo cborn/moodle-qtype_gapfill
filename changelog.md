@@ -1,4 +1,32 @@
-### Version 2.133 of the Moodle Gapfill question type
+### Version 2.137 of the Moodle Gapfill question type Jan 2023
+Fix compatibility on mobile with dark theme (css tweak)
+https://github.com/marcusgreen/moodle-qtype_gapfill/pull/100
+
+Centre droptarget text to better handle long answers
+https://github.com/marcusgreen/moodle-qtype_gapfill/issues/99
+
+Additional English language sample questions.
+
+### Version 2.136 of the Moodle Gapfill question type Nov 2022
+Remove html comments from code before rendering. There is no reason to include comments at run time and when people copy and paste from other sources it can include items like  <!--[if !supportLists]
+creating spurious gaps. Thanks to sunnac for reporting this.
+
+New behat test to confirm core mlang and mlang2 filters work as expected.
+
+Additional English language sample questions.
+
+### Version 2.135 of the Moodle Gapfill question type Sept 2022
+The use of jQuery UI broke the display of the 'dock' in Moodle 4.0 https://github.com/marcusgreen/moodle-qtype_gapfill/issues/83. Thanks to Vitaliy Baran for reporting that.  Switched to using ES6/HTML5 drag and drop code.
+More English language example questions
+
+### Version 2.134 of the Moodle Gapfill question type Jun 2022
+
+Fix for duplicated draggables when used in the mobile apps. Thanks to Nicholas Stefanski for reporting this and for contributing a code solution.
+
+Added $CFG->wwwwroot in front of path to mobile css for where moodle home hangs of a folder from the
+url.
+
+### Version 2.133 of the Moodle Gapfill question type Mar 2022
 Missing space around or in non English feedback. Where the language was not
 English and there is more than one correct answer the space was missing around
 the tanslation of or. So in German if the correct answers are red or green it would present as
@@ -13,6 +41,8 @@ https://github.com/marcusgreen/moodle-qtype_gapfill/pull/77
 Which gave me the idea of validating the output.
 Fix for layout in optionsaftertext mode
 Bump to version of Moodle required from 3.3 to 3.7, to make support easier
+Updates to behat tests to work with Moodle 4.0. No further support for
+MS IE browser 11.
 
 ### Version 2.132 of the Moodle Gapfill question type Jul 2021
 Fix for https://github.com/marcusgreen/moodle-qtype_gapfill/issues/76

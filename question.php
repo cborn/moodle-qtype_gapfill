@@ -21,7 +21,6 @@
  * @copyright  2017 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 /**
  * Gapfill question definition class.
  *
@@ -675,7 +674,7 @@ class qtype_gapfill_question extends question_graded_automatically_with_countbac
             }
             $fieldname = $question->field($place);
             $rightanswer = $question->get_right_choice_for($place);
-            if (($options->correctness) or ( $options->numpartscorrect)) {
+            if (($options->correctness) || ( $options->numpartscorrect)) {
                 $response = $qa->get_last_qt_data();
 
                 if (array_key_exists($fieldname, $response)) {

@@ -21,7 +21,6 @@
  * @copyright  2019 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Generates the output for gapfill questions
@@ -132,9 +131,9 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
                 }
                  $cssclasses = $question->is_used($potentialanswer, $qa, $cssclasses);
                 /* the question->id is necessary to make a draggable potential answer unique for multi question quiz pages */
-                $answeroptions .= '<span id="pa:_' . $question->id . '_' . $potentialanswerid++
+                $answeroptions .= '<span draggable="true" id="pa:_' . $question->id . '_' . $potentialanswerid++
                     . '" class= "' . $cssclasses . '">' .
-                    $potentialanswer . "</span>";
+                    $potentialanswer . " </span>";
             }
         }
         $answeroptions = html_writer::tag('div', $answeroptions, array('class' => 'answeroptions'));
@@ -191,7 +190,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
         /* $options->correctness is really about it being ready to mark, */
         $aftergaptext = "";
         $inputclass = "";
-        if ((($options->correctness) or ($options->numpartscorrect)) && isset($markedgaps['p' . $place])) {
+        if ((($options->correctness) || ($options->numpartscorrect)) && isset($markedgaps['p' . $place])) {
             $gap = $markedgaps['p' . $place];
             $fraction = $gap['fraction'];
             $response = $qa->get_last_qt_data();
@@ -219,7 +218,7 @@ class qtype_gapfill_renderer extends qtype_with_combined_feedback_renderer {
             'name' => $inputname,
             'value' => $currentanswer,
             'id' => $inputname,
-            'size' => $size,
+            'size' => $size
         );
         /* When previewing after a quiz is complete */
         if ($options->readonly) {

@@ -59,9 +59,8 @@ var result = {
             var i;
             for (i = 0; i < draggables.length; i++) {
                 // If singleuse is set some fields may be hidden .
-               draggables[i].classList.remove('hide');
-              /* Optionsaftertext reference is to stop the listener being applied twice */
-                if (draggables[i].id && !this.question.optionsaftertext) {
+                draggables[i].classList.remove('hide');
+                if (draggables[i].id) {
                     draggables[i].addEventListener('click', function() {
                         self.LastItemClicked = pickAnswerOption(draggables, event);
                     });
@@ -81,7 +80,7 @@ var result = {
         };
 
         if (!this.question) {
-            logger.warn('Aborting because of no question received.');
+            this.CoreAppProvider.logger.warn('Aborting because of no question received.');
             return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
         }
         var div = document.createElement('div');
@@ -123,7 +122,7 @@ var result = {
         this.question.text = this.CoreDomUtilsProvider.getContentsOfElement(div, '.qtext');
 
         if (typeof this.question.text == 'undefined') {
-            this.logger.warn('Aborting because of an error parsing question.', this.question.name);
+            this.CoreAppProvider.logger.warn('Aborting because of an error parsing question.', this.question.name);
             return this.CoreQuestionHelperProvider.showComponentError(this.onAbort);
         }
         setTimeout(()=> {
