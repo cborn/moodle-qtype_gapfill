@@ -15,30 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Gapfill question type  capability definition
+ * Gapfill question type inport skins
  *
  * @package    qtype_gapfill
  * @copyright  2021 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// defined('MOODLE_INTERNAL') || die();
 
 /**
  * Perform the post-install procedures.
  */
-require_once('../../../../config.php');
+
+defined('MOODLE_INTERNAL') || die();
 
 xmldb_qtype_gapfill_install();
 
 function xmldb_qtype_gapfill_install() {
-    global $DB;
-    $filenames = glob(__DIR__.'/themes/*');
+    global $DB, $CFG;
+    $filenames = glob($CFG->dirroot.'/question/type/gapfill/skins/*');
     foreach ($filenames as $filename) {
         $xml = simplexml_load_file($filename);
-        $style = (string) $xml->style;
-        $style = '<style>'.$style.'</style>';
-        $data = (object) ['name' => (string) $xml->name, 'themecode' => $style ];
-        $DB->insert_record('question_gapfill_theme', $data);
+        foreach ($xml as $element) {
+            $name = (string) $element->name;
+            $style = (string) $element->style;
+            $style = '<style>'.$style.'</style>';
+            $data = (object) ['name' => (string) $name, 'themecode' => $style ];
+            $DB->insert_record('question_gapfill_theme', $data);
+        }
     }
 }
 

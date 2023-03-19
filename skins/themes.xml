@@ -1,12 +1,14 @@
  <themes>
-    <theme name="BigText">
+    <theme>
+    <name>BigText</name>
       <style>
       .que.gapfill .draggable, p{
         font-size:1.5em;
       }
       </style>
     </theme>
-    <theme name="Bulge">
+    <theme>
+      <name>Bulge</name>
       <style>
       .draggable:hover{
               transform: scale(1.2);
@@ -16,7 +18,8 @@
       }
       </style>
     </theme>
-    <theme name="Underscore">
+    <theme>
+      <name>Underscore</name>
       <style>
       .que.gapfill  input.droptarget,input.typetext{
           background:none;
