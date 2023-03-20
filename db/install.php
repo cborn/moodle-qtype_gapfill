@@ -18,7 +18,7 @@
  * Gapfill question type inport skins
  *
  * @package    qtype_gapfill
- * @copyright  2021 Marcus Green
+ * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,8 +27,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
-xmldb_qtype_gapfill_install();
 
 function xmldb_qtype_gapfill_install() {
     global $DB, $CFG;
