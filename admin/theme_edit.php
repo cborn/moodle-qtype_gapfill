@@ -16,58 +16,37 @@
 
 /**
  *
- * Import sample Gapfill questions f.
+ * Edit themes form
  *
  * This does the same as the standard xml import but easier
  * @package    qtype_gapfill
- * @copyright  2015 Marcus Green
+ * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir.'/formslib.php');
 
-//admin_externalpage_setup('qtype_gapfill_theme_edit');
-$previous = optional_param('previous', '', PARAM_TEXT);
-$next = optional_param('next', '', PARAM_TEXT);
-$id = optional_param('id', '', PARAM_INT);
-global $PAGE;
-$PAGE->set_context(context_system::instance());
-$url = new moodle_url('/course/report/completion/index.php', ['course' => 'popo']);
-$PAGE->set_url($url);
+$page   = optional_param('page', 1, PARAM_INT);
+$newrecord = optional_param('newrecord', '', PARAM_TEXT);
+$save = optional_param('save', '', PARAM_TEXT);
 
+$PAGE->set_context(context_system::instance());
+$baseurl = new moodle_url('/question/type/gapfill/admin/theme_edit.php', ['page' => $page]);
 admin_externalpage_setup('qtype_gapfill_theme_edit');
 
-
 /**
- *  Edit gapfill question type themes
+ *  Edit gapfill question type skins
  *
- * @copyright Marcus Green 2021
+ * @copyright Marcus Green 2023
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * Form for editing gapfill quesiton type themes
+ * Form for editing gapfill quesiton type skins
  */
 class gapfill_theme_edit_form extends moodleform {
-    /**
-     *
-     * @var number
-     */
-    public $questioncategory;
-    /**
-     *
-     * @var number
-     */
-    public $course;
-    /**
-     * mini form for entering the import details
-     */
+
     protected function definition() {
-        global $PAGE, $DB;
-        $id = $this->_customdata['id'];
-
-        $record = $DB->get_record('question_gapfill_theme', ['id' => $id]);
-
-        $maxid = $DB->get_record_sql("SELECT MAX(id) as id FROM {question_gapfill_theme}")->id;
-        $minid = $DB->get_record_sql("SELECT MIN(id) as id FROM {question_gapfill_theme}")->id;
+        global $PAGE;
+        $record = $this->_customdata['record'];
 
         $mform = $this->_form;
         $PAGE->requires->css('/question/type/gapfill/amd/src/codemirror/lib/codemirror.css');
@@ -77,107 +56,78 @@ class gapfill_theme_edit_form extends moodleform {
 
         $mform->addElement('text', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $record->id);
+        //$mform->setDefault('id', $record->id);
 
         $mform->addElement('text', 'name', 'Name');
         $mform->setType('name', PARAM_TEXT);
-        $mform->setDefault('name', $record->name);
+        //$mform->setDefault('name', $record->name);
 
         $mform->addElement('textarea', 'themecode', get_string('themes', 'qtype_gapfill'), ['rows' => 30, 'cols' => 80]);
 
-        $mform->setDefault('themecode', $record->themecode);
+        // $mform->setDefault('themecode', $record->themecode);
         $mform->setType('themecode', PARAM_RAW);
-        $this->add_action_buttons(true, 'Save');
 
         $navbuttons = [];
-        $navbuttons[] = $mform->createElement('submit', 'previous', 'Previous');
-        $mform->disabledIf('previous', 'id', 'eq',$minid);
-
-        if($id == $minid) {
-            $navbuttons[] = $mform->createElement('static','firstrecord','','First record');
-        }
-
-        $navbuttons[] = $mform->createElement('submit', 'next', 'Next');
-
-        $mform->disabledIf('next', 'id', 'eq',$maxid);
-
-        if($id == $maxid) {
-          $navbuttons[] = $mform->createElement('static','lastrecord','','Last record');
-        }
-
-        $navbuttons[] = $mform->createElement('submit', 'newrecord', 'New theme');
-
+        $navbuttons[] = $mform->createElement('submit', 'save', 'Save   ');
+        $navbuttons[] = $mform->createElement('submit', 'cancel', 'Cancel');
+        $navbuttons[] = $mform->createElement('submit', 'newrecord', 'New Record');
+        $navbuttons[] = $mform->createElement('submit', 'delete', 'Delete Record');
         $mform->addGroup($navbuttons);
-        $this->definition_after_data();
+    }
+    public function set_data($skin) {
+        $this->_form->getElement('id')->setValue($skin->id);
+        $this->_form->getElement('name')->setValue($skin->name ?? "");
+        $this->_form->getElement('themecode')->setValue($skin->themecode ?? "");
+
     }
 
 }
-if ($id == '') {
-    $sql = 'select min(id) id from {question_gapfill_theme}';
-    $record = $DB->get_field_sql($sql);
-    if ($record) {
-        $id = $record;
-    } else {
-        $id = $DB->insert_record('question_gapfill_theme', (object) ['name' => '', 'themecode' => '']);
+
+$recordcount = $DB->count_records('question_gapfill_theme');
+if ($recordcount == 0) {
+    $params = (object) [
+        'name' => '',
+        'themecode' => ''
+    ];
+    $DB->insert_record('question_gapfill_theme', $params );
+    $recordcount = 1;
+}
+if ($page >= $recordcount) {
+    $page = 0;
+    $start = 0;
+}
+
+
+$recordset = $DB->get_recordset('question_gapfill_theme');
+$count = 0;
+foreach ($recordset as $key => $value) {
+    if ($count == $page) {
+        $record = $value;
+        break;
     }
+    $count++;
 }
 
-if ($next > "") {
-        $sql = 'SELECT * FROM {question_gapfill_theme}
-        WHERE id >:id
-        ORDER BY id';
-        $record = $DB->get_record_sql($sql, ['id' => $id], IGNORE_MULTIPLE);
-        $id = $record->id;
-}
-if ($previous > "") {
-    $sql = 'SELECT * FROM {question_gapfill_theme}
-    WHERE id < :id
-    ORDER BY id';
-    if ($record = $DB->get_record_sql($sql, ['id' => $id], IGNORE_MULTIPLE)) {
-        $id = $record->id;
-    }
-}
-
-
-$url = new moodle_url('/question/type/gapfill/admin/theme_edit.php', ['id' => $id]);
-$mform = new gapfill_theme_edit_form($url, ['id' => $id]);
-
-$message = '';
-global $DB;
-
+$mform = new gapfill_theme_edit_form($baseurl, ['record' => $record]);
+$mform->set_data($record);
 if ($data = $mform->get_data()) {
-//     if (isset($data->next)) {
-//         $sql = 'SELECT * FROM {question_gapfill_theme}
-//         WHERE id >:id
-//         ORDER BY id';
-//         $record = $DB->get_records_sql($sql, ['id' => $id], IGNORE_MULTIPLE);
-//     }
-//     if (isset($data->Previous)) {
-//         $message = 'Previous';
-//     }
-    if (isset($data->submitbutton)) {
-        if ($id) {
-            $record = $DB->get_record('question_gapfill_theme', ['id' => $id]);
+    if (isset($data->save)) {
             $params = [
-                'id'   => $id,
-                'name' => $data->themename,
+                'id' => $record->id,
+                'name' => $data->name,
                 'themecode' => $data->themecode
             ];
             $DB->update_record('question_gapfill_theme', $params);
-        }
+            $data->id = $record->id;
+    }
+    if (isset($data->newrecord)) {
+        unset($record->id);
+        $DB->insert_record('question_gapfill_theme', $record);
     }
 
-}
-
-
-if ($data = $mform->get_data()) {
-    if (isset($data->next) || isset($data->previous)) {
-        $url->param('id', $id);
-        redirect($url);
-    }
 }
 
 echo $OUTPUT->header();
+echo $OUTPUT->paging_bar($recordcount, $page, 1, $baseurl);
 $mform->display();
-
 echo $OUTPUT->footer();
