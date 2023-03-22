@@ -30,6 +30,8 @@ require_once($CFG->libdir.'/formslib.php');
 $page   = optional_param('page', 1, PARAM_INT);
 $newrecord = optional_param('newrecord', '', PARAM_TEXT);
 $save = optional_param('save', '', PARAM_TEXT);
+$delete = optional_param('delete', '', PARAM_TEXT);
+
 
 $PAGE->set_context(context_system::instance());
 admin_externalpage_setup('qtype_gapfill_theme_edit');
@@ -54,12 +56,9 @@ class gapfill_theme_edit_form extends moodleform {
 
         $mform->addElement('text', 'id');
         $mform->setType('id', PARAM_INT);
-
         $mform->addElement('text', 'name', 'Name');
         $mform->setType('name', PARAM_TEXT);
-
         $mform->addElement('textarea', 'themecode', get_string('themes', 'qtype_gapfill'), ['rows' => 30, 'cols' => 80]);
-
         $mform->setType('themecode', PARAM_RAW);
 
         $navbuttons = [];
@@ -89,8 +88,8 @@ if ($recordcount == 0 || $newrecord) {
     $page = $DB->count_records('question_gapfill_theme');
     $page --;
 }
-$recordcount = $DB->count_records('question_gapfill_theme');
 
+$recordcount = $DB->count_records('question_gapfill_theme');
 $recordset = $DB->get_recordset('question_gapfill_theme');
 $count = 0;
 foreach ($recordset as $key => $value) {
@@ -99,6 +98,22 @@ foreach ($recordset as $key => $value) {
         break;
     }
     $count++;
+}
+
+if ($delete ) {
+    $DB->delete_records('question_gapfill_theme', ['id' => $record->id]);
+    $page--;
+    $recordset = $DB->get_recordset('question_gapfill_theme');
+    $count = 0;
+    foreach ($recordset as $key => $value) {
+        if ($count == $page) {
+            $record = $value;
+            break;
+        }
+        $count++;
+    }
+    $recordcount = $DB->count_records('question_gapfill_theme');
+
 }
 $baseurl = new moodle_url('/question/type/gapfill/admin/theme_edit.php', ['page' => $page]);
 
@@ -119,9 +134,6 @@ if ($data = $mform->get_data()) {
 $mform->set_data($record);
 
 echo $OUTPUT->header();
-if (!$newrecord) {
-    echo $OUTPUT->paging_bar($recordcount, $page, 1, $baseurl);
-}
-
+echo $OUTPUT->paging_bar($recordcount, $page, 1, $baseurl);
 $mform->display();
 echo $OUTPUT->footer();
