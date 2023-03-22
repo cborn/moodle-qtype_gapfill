@@ -32,7 +32,6 @@ $newrecord = optional_param('newrecord', '', PARAM_TEXT);
 $save = optional_param('save', '', PARAM_TEXT);
 
 $PAGE->set_context(context_system::instance());
-$baseurl = new moodle_url('/question/type/gapfill/admin/theme_edit.php', ['page' => $page]);
 admin_externalpage_setup('qtype_gapfill_theme_edit');
 
 /**
@@ -46,7 +45,6 @@ class gapfill_theme_edit_form extends moodleform {
 
     protected function definition() {
         global $PAGE;
-        $record = $this->_customdata['record'];
 
         $mform = $this->_form;
         $PAGE->requires->css('/question/type/gapfill/amd/src/codemirror/lib/codemirror.css');
@@ -56,15 +54,12 @@ class gapfill_theme_edit_form extends moodleform {
 
         $mform->addElement('text', 'id');
         $mform->setType('id', PARAM_INT);
-        //$mform->setDefault('id', $record->id);
 
         $mform->addElement('text', 'name', 'Name');
         $mform->setType('name', PARAM_TEXT);
-        //$mform->setDefault('name', $record->name);
 
         $mform->addElement('textarea', 'themecode', get_string('themes', 'qtype_gapfill'), ['rows' => 30, 'cols' => 80]);
 
-        // $mform->setDefault('themecode', $record->themecode);
         $mform->setType('themecode', PARAM_RAW);
 
         $navbuttons = [];
@@ -78,25 +73,23 @@ class gapfill_theme_edit_form extends moodleform {
         $this->_form->getElement('id')->setValue($skin->id);
         $this->_form->getElement('name')->setValue($skin->name ?? "");
         $this->_form->getElement('themecode')->setValue($skin->themecode ?? "");
-
     }
 
 }
 
+$emptyparams = (object) [
+    'name' => '',
+    'themecode' => ''
+];
 $recordcount = $DB->count_records('question_gapfill_theme');
-if ($recordcount == 0) {
-    $params = (object) [
-        'name' => '',
-        'themecode' => ''
-    ];
-    $DB->insert_record('question_gapfill_theme', $params );
-    $recordcount = 1;
-}
-if ($page >= $recordcount) {
-    $page = 0;
-    $start = 0;
-}
 
+if ($recordcount == 0 || $newrecord) {
+    $id = $DB->insert_record('question_gapfill_theme', $emptyparams );
+    $record = $DB->get_record('question_gapfill_theme', ['id' => $id]);
+    $page = $DB->count_records('question_gapfill_theme');
+    $page --;
+}
+$recordcount = $DB->count_records('question_gapfill_theme');
 
 $recordset = $DB->get_recordset('question_gapfill_theme');
 $count = 0;
@@ -107,27 +100,28 @@ foreach ($recordset as $key => $value) {
     }
     $count++;
 }
+$baseurl = new moodle_url('/question/type/gapfill/admin/theme_edit.php', ['page' => $page]);
 
+$record->page = $page;
 $mform = new gapfill_theme_edit_form($baseurl, ['record' => $record]);
-$mform->set_data($record);
 if ($data = $mform->get_data()) {
     if (isset($data->save)) {
             $params = [
-                'id' => $record->id,
+                'id' => $data->id,
                 'name' => $data->name,
                 'themecode' => $data->themecode
             ];
             $DB->update_record('question_gapfill_theme', $params);
-            $data->id = $record->id;
-    }
-    if (isset($data->newrecord)) {
-        unset($record->id);
-        $DB->insert_record('question_gapfill_theme', $record);
-    }
+            $record = $DB->get_record('question_gapfill_theme', ['id' => $data->id]);
 
+    }
 }
+$mform->set_data($record);
 
 echo $OUTPUT->header();
-echo $OUTPUT->paging_bar($recordcount, $page, 1, $baseurl);
+if (!$newrecord) {
+    echo $OUTPUT->paging_bar($recordcount, $page, 1, $baseurl);
+}
+
 $mform->display();
 echo $OUTPUT->footer();
