@@ -19,9 +19,9 @@
       </style>
     </theme>
     <theme>
-      <name>Gapfill Underscore</name>
+      <name>Underscore</name>
       <style>
-      .que.gapfill  input.droptarget,input.typetext{
+      .que.gapfill  input.droptarget, input.typetext {
           background:none;
           border:none;
           border-bottom: 1px dashed black;
